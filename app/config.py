@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional
+from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple
 import os
 import tomllib
 
@@ -49,6 +49,7 @@ class DOMSelectors:
 
     login_with_github: Optional[str] = None
     checkin_button: Optional[str] = None
+    checkin_button_candidates: Tuple[str, ...] = field(default_factory=tuple)
     success_keywords: Iterable[str] = field(default_factory=list)
     already_keywords: Iterable[str] = field(default_factory=list)
     failure_keywords: Iterable[str] = field(default_factory=list)
@@ -138,9 +139,36 @@ def _load_selectors_config(data: Mapping[str, object]) -> SelectorConfig:
     if not isinstance(api_raw, Mapping):
         raise ConfigError("selectors.api must be a mapping")
 
+    candidates: List[str] = []
+
+    def _extend_candidates(value: object, *, label: str) -> None:
+        if value is None:
+            return
+        if isinstance(value, str):
+            stripped = value.strip()
+            if stripped:
+                candidates.append(stripped)
+            return
+        if isinstance(value, Sequence):
+            for item in value:
+                if item is None:
+                    continue
+                stripped = str(item).strip()
+                if stripped:
+                    candidates.append(stripped)
+            return
+        raise ConfigError(f"selectors.dom.{label} must be a string or an array of strings")
+
+    _extend_candidates(dom_raw.get("checkin_button"), label="checkin_button")
+    _extend_candidates(dom_raw.get("checkin_buttons"), label="checkin_buttons")
+
+    deduped_candidates = tuple(dict.fromkeys(candidates))
+    primary_selector = deduped_candidates[0] if deduped_candidates else None
+
     dom = DOMSelectors(
         login_with_github=str(dom_raw.get("login_with_github")) if dom_raw.get("login_with_github") else None,
-        checkin_button=str(dom_raw.get("checkin_button")) if dom_raw.get("checkin_button") else None,
+        checkin_button=primary_selector,
+        checkin_button_candidates=deduped_candidates,
         success_keywords=list(map(str, dom_raw.get("success_keywords", []))),
         already_keywords=list(map(str, dom_raw.get("already_keywords", []))),
         failure_keywords=list(map(str, dom_raw.get("failure_keywords", []))),

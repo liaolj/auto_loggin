@@ -15,10 +15,14 @@ max_rows = 2000
 
 [selectors.dom]
 login_with_github = "text=Sign in with GitHub"
-checkin_button = "button:has-text('签到')"
-success_keywords = ["签到成功", "今日已签到", "Checked in"]
-already_keywords = ["已签到", "already"]
-failure_keywords = ["失败", "错误", "重试"]
+checkin_button = [
+  "button:has-text('签到')",
+  "button:has-text(\"Check in\")",
+  "button:has-text(\"Check In\")",
+]
+success_keywords = ["签到成功", "今日已签到", "Checked in", "Check-in successful"]
+already_keywords = ["已签到", "already", "already checked in"]
+failure_keywords = ["失败", "错误", "重试", "failed"]
 
 [selectors.api]
 checkin_path_contains = "/api/checkin"
