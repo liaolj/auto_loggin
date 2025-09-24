@@ -181,9 +181,9 @@ to        = "you@example.com"
 
 [selectors.dom]
 login_with_github = "text=Sign in with GitHub"
-checkin_button    = "text=签到"        # 视站点实际而定
-success_keywords  = ["签到成功","已签到","Checked in"]
-failure_keywords  = ["失败","错误"]
+checkin_button    = ["text=签到", "text=Check in"]  # 支持多候选，按顺序匹配
+success_keywords  = ["签到成功","已签到","Checked in", "Check-in successful"]
+failure_keywords  = ["失败","错误","failed"]
 
 [selectors.api]
 checkin_path_contains = "/api/checkin"  # 若有
@@ -317,9 +317,9 @@ timestamp_local,date,slot,stage,result,err_category,err_summary,http_status,dura
 ```toml
 [selectors.dom]
 login_with_github = "text=Sign in with GitHub"
-checkin_button    = "button:has-text('签到')"
-success_keywords  = ["签到成功","今日已签到","Checked in"]
-failure_keywords  = ["失败","错误","重试"]
+checkin_button    = ["button:has-text('签到')", "button:has-text(\"Check in\")"]
+success_keywords  = ["签到成功","今日已签到","Checked in", "Check-in successful"]
+failure_keywords  = ["失败","错误","重试","failed"]
 
 [selectors.api]
 checkin_path_contains = "/api/checkin"

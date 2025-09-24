@@ -110,10 +110,31 @@ async def _signin_async(config: AppConfig, slot: str, history: HistoryLogger):
                 if count:
                     raise AuthInvalidError("Login button detected; authorization likely expired")
 
-            if dom_selectors.checkin_button:
-                button = page.locator(dom_selectors.checkin_button)
-                await button.wait_for(state="visible", timeout=config.playwright.launch_timeout_ms)
-                await button.click()
+            selectors_to_try = dom_selectors.checkin_button_candidates
+            if not selectors_to_try and dom_selectors.checkin_button:
+                selectors_to_try = (dom_selectors.checkin_button,)
+
+            if selectors_to_try:
+                last_error: Optional[PlaywrightError] = None
+                for selector in selectors_to_try:
+                    button = page.locator(selector)
+                    try:
+                        await button.wait_for(
+                            state="visible", timeout=config.playwright.launch_timeout_ms
+                        )
+                        await button.click()
+                    except PlaywrightError as exc:
+                        last_error = exc
+                        print(
+                            f"Selector '{selector}' did not match a visible button within the timeout; "
+                            "trying next candidate..."
+                        )
+                        continue
+                    break
+                else:
+                    if last_error:
+                        raise last_error
+                    raise PlaywrightError("Check-in button not found for provided selectors")
             else:
                 print("checkin_button selector missing; waiting briefly for automatic flow...")
                 await page.wait_for_timeout(1500)
