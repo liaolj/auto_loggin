@@ -1,0 +1,26 @@
+[playwright]
+base_url = "https://anyrouter.top/dashboard"
+storage_state_path = "storage_state.json"
+headless = true
+slow_mo_ms = 0
+launch_timeout_ms = 30000
+
+[schedule]
+timezone = "Asia/Singapore"
+slots = { morning = "09:00", noon = "14:00", evening = "21:00" }
+
+[history]
+csv_path = "data/history.csv"
+max_rows = 2000
+
+[selectors.dom]
+login_with_github = "text=Sign in with GitHub"
+checkin_button = "button:has-text('签到')"
+success_keywords = ["签到成功", "今日已签到", "Checked in"]
+already_keywords = ["已签到", "already"]
+failure_keywords = ["失败", "错误", "重试"]
+
+[selectors.api]
+checkin_path_contains = "/api/checkin"
+success_keys = ["success", "message"]
+already_keywords = ["already", "已签到"]

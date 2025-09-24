@@ -203,3 +203,10 @@ playwright/.cache/
 # Miscellaneous
 *.tgz
 *.tar.gz
+
+# Allow keeping data directory placeholder
+!data/.gitkeep
+
+# Python artifacts
+__pycache__/
+*.pyc
